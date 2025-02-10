@@ -23,6 +23,7 @@ import {
     kbdInputRegex,
     kbdPasteRegex,
 } from '~/components/editor/extensions/kbd';
+import { CodeBlock } from './codeblock-codemirror';
 
 export const generateJSON = (
     html: string,
@@ -342,66 +343,7 @@ const HashtagParserNode = Node.create({
     },
 });
 
-export const CodeBlockParserNode = CodeBlockLowlight.extend({
-    addAttributes() {
-        return {
-            language: {
-                default: null,
-                parseHTML: element => {
-                    const languageClassPrefix = 'language-';
-                    const classNames = [
-                        ...(([(element.firstChild as any)?.className] ||
-                            []) as string[]),
-                    ];
-                    const languages = classNames
-                        .join('')
-                        .split(' ')
-                        .filter(className =>
-                            className.startsWith(languageClassPrefix),
-                        )
-                        .map(className =>
-                            className.replace(languageClassPrefix, ''),
-                        );
-                    const language = languages[0];
-
-                    if (!language) {
-                        return null;
-                    }
-
-                    return language;
-                },
-                renderHTML: attributes => {
-                    if (!attributes.language) {
-                        return null;
-                    }
-
-                    return {
-                        class:
-                            this.options.languageClassPrefix +
-                            attributes.language,
-                    };
-                },
-            },
-        };
-    },
-
-    parseHTML() {
-        return [
-            {
-                tag: 'pre',
-                preserveWhitespace: 'full',
-            },
-        ];
-    },
-
-    renderHTML({ HTMLAttributes }) {
-        return [
-            'pre',
-            this.options.HTMLAttributes,
-            ['code', HTMLAttributes, 0],
-        ];
-    },
-});
+export const CodeBlockParserNode = CodeBlock
 
 export const ParserNodesList = [
     InlineTaskParserNode,

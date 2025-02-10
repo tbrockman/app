@@ -251,6 +251,7 @@ export const createMainWindow = async (
     }
 
     mainWindowState.manage(appWindows.main);
+    appWindows.main.webContents.openDevTools();
 
     if (ARGS.dev) {
         appWindows.main.webContents.openDevTools();

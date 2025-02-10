@@ -1,24 +1,11 @@
 <template>
-    <node-view-wrapper
-        class="code-block"
-        as="pre"
-        :class="{ open: dropdownOpen }"
-        @mouseleave.native="handleMouseLeave"
-    >
+    <node-view-wrapper class="code-block" as="pre" :class="{ open: dropdownOpen }"
+        @mouseleave.native="handleMouseLeave">
         <div v-if="editor.isEditable" class="code-block-menu">
-            <LanguageSelector
-                v-if="!$utils.isMobile"
-                class="codeblock-language-selector"
-                :class="{ open: selectionOpen }"
-                :languages="languages"
-                :active-language="node.attrs.language"
-                :selection-open="selectionOpen"
-                contenteditable="false"
-                @change="selectionOpen = $event"
-                @select-language="handleSelectLanguage"
-                @blur="selectionOpen = false"
-                @focus="selectionOpen = true"
-            />
+            <LanguageSelector v-if="!$utils.isMobile" class="codeblock-language-selector"
+                :class="{ open: selectionOpen }" :languages="languages" :active-language="node.attrs.language"
+                :selection-open="selectionOpen" contenteditable="false" @change="selectionOpen = $event"
+                @select-language="handleSelectLanguage" @blur="selectionOpen = false" @focus="selectionOpen = true" />
             <div v-else></div>
             <div class="code-block-menu__controls">
                 <button :class="{ open: selectionOpen }" @click="onCopyClick">
@@ -28,20 +15,12 @@
         </div>
         <div class="code-block__wrapper">
             <div class="code-block__wrapper__left" contenteditable="false">
-                <div
-                    v-for="line in lineNumbers"
-                    :key="line"
-                    class="code-block__line-number"
-                >
+                <div v-for="line in lineNumbers" :key="line" class="code-block__line-number">
                     {{ line }}
                 </div>
             </div>
-            <node-view-content
-                as="code"
-                style="min-width: 1px; white-space: pre"
-                class="code-block__code"
-                spellcheck="false"
-            />
+            <node-view-content as="code" style="min-width: 1px; white-space: pre" class="code-block__code"
+                spellcheck="false" />
         </div>
     </node-view-wrapper>
 </template>
@@ -184,8 +163,7 @@ export default class CodeBlockComponent extends Vue {
             color: var(--extension-codeblock-line-number-text-color);
             user-select: none;
             padding: 0 6px 0 0;
-            border-right: 1px solid
-                var(--extension-codeblock-line-number-line-color);
+            border-right: 1px solid var(--extension-codeblock-line-number-line-color);
             margin-right: 6px;
 
             .code-block__line-number {

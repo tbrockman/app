@@ -1,4 +1,3 @@
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
 import { VueNodeViewRenderer } from '@tiptap/vue-2';
 import CodeBlockComponent from './CodeBlockComponent.vue';
@@ -11,14 +10,15 @@ import {
     wrappingCharacters,
     wrapSelection,
 } from '~/components/editor/extensions/codeblock/helpers';
+import { CodeBlock } from '../codeblock-codemirror';
 
 registerEditorExtension({
     type: EditorTypes.FULL,
     createInstance(ctx: EditorContext) {
         const indent = new Array(4).fill('').join(' ');
-        ctx.bubbleMenuExceptions.add(CodeBlockLowlight.name);
+        ctx.bubbleMenuExceptions.add(CodeBlock.name);
 
-        const codeblock = CodeBlockLowlight.extend({
+        const codeblock = CodeBlock.extend({
             addKeyboardShortcuts() {
                 const wrapRecord = wrappingCharacters.reduce(
                     (acc: Record<string, () => boolean>, character: string) => {
@@ -68,8 +68,8 @@ registerEditorExtension({
                                 );
                             const from = Math.min(
                                 parentPosition +
-                                    textBeforeSelection.lastIndexOf('\n') +
-                                    2,
+                                textBeforeSelection.lastIndexOf('\n') +
+                                2,
                                 selection.from,
                             );
                             const text = editor.state.doc.textBetween(
@@ -89,12 +89,12 @@ registerEditorExtension({
                                 TextSelection.create(
                                     tr.doc,
                                     selection.from -
-                                        (moveFrom && from < selection.from
-                                            ? indent.length
-                                            : 0),
+                                    (moveFrom && from < selection.from
+                                        ? indent.length
+                                        : 0),
 
                                     selection.to -
-                                        (text.length - newText.length),
+                                    (text.length - newText.length),
                                 ),
                             );
                             return true;
@@ -121,8 +121,8 @@ registerEditorExtension({
                                 );
                             const from = Math.min(
                                 parentPosition +
-                                    textBeforeSelection.lastIndexOf('\n') +
-                                    2,
+                                textBeforeSelection.lastIndexOf('\n') +
+                                2,
                                 selection.from,
                             );
                             const text = editor.state.doc.textBetween(
@@ -143,12 +143,12 @@ registerEditorExtension({
                                 TextSelection.create(
                                     tr.doc,
                                     selection.from +
-                                        (from < selection.from
-                                            ? indent.length
-                                            : 0),
+                                    (from < selection.from
+                                        ? indent.length
+                                        : 0),
                                     selection.to +
-                                        indentationIndexes.length *
-                                            indent.length,
+                                    indentationIndexes.length *
+                                    indent.length,
                                 ),
                             );
                             return true;
@@ -171,7 +171,7 @@ registerEditorExtension({
                                 ranges.length === 1 &&
                                 ranges[0].$from.parentOffset === 0 &&
                                 ranges[0].$to.parentOffset ===
-                                    $from.parent.content.size
+                                $from.parent.content.size
                             ) {
                                 return false;
                             } else {
@@ -218,8 +218,8 @@ registerEditorExtension({
                             );
                         const from = Math.min(
                             parentPosition +
-                                textBeforeSelection.lastIndexOf('\n') +
-                                2,
+                            textBeforeSelection.lastIndexOf('\n') +
+                            2,
                             selection.from,
                         );
                         const text = editor.state.doc.textBetween(
@@ -299,8 +299,8 @@ registerEditorExtension({
                             );
                         const from = Math.min(
                             parentPosition +
-                                textBeforeSelection.lastIndexOf('\n') +
-                                2,
+                            textBeforeSelection.lastIndexOf('\n') +
+                            2,
                             selection.from,
                         );
                         const text = editor.state.doc.textBetween(
@@ -421,6 +421,7 @@ registerEditorExtension({
             },
 
             renderHTML({ HTMLAttributes }) {
+                console.log('html being rendered here', HTMLAttributes)
                 return [
                     'pre',
                     this.options.HTMLAttributes,
@@ -544,8 +545,8 @@ registerEditorExtension({
                                 }
                                 const language = hasLang
                                     ? rootElement.getAttribute(
-                                          'data-tagsearch-lang',
-                                      )
+                                        'data-tagsearch-lang',
+                                    )
                                     : null;
                                 const { tr } = view.state;
 
