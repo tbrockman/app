@@ -57,7 +57,7 @@ export default class LinearViewNestedCommentItem extends Vue {
         const date = new Date(this.item.createdAt);
         return formatDistanceToNowStrict(date, {
             addSuffix: true,
-            includeSeconds: true,
+            unit: 'second'
         });
     }
 }

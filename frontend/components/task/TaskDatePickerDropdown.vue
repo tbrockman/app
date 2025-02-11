@@ -366,6 +366,7 @@ export default class TaskDatePickerDropdown extends Vue {
     onStartTimePicked(value: Date | null) {
         if (!value) {
             this.$emit('clear-time');
+            return;
         }
         const oldStart = extractDate(this.entity.start) ?? null;
         const oldEnd = extractDate(this.entity.end) ?? null;
@@ -438,7 +439,7 @@ export default class TaskDatePickerDropdown extends Vue {
             },
             on: {
                 change: (value: string | null) => {
-                    this.onStartTimePicked(value ? parseISO(value) : value);
+                    this.onStartTimePicked(value ? parseISO(value) : null);
                 },
             },
             onClose: () => {

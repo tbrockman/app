@@ -158,47 +158,47 @@ const config: NuxtConfig = {
 
             ...(ACR_PLATFORM === 'web'
                 ? [
-                      {
-                          hid: 'description',
-                          name: 'description',
-                          content: DESCRIPTION,
-                      },
-                      { name: 'msapplication-TileColor', content: '#000000' },
-                      { name: 'theme-color', content: '#000000' },
+                    {
+                        hid: 'description',
+                        name: 'description',
+                        content: DESCRIPTION,
+                    },
+                    { name: 'msapplication-TileColor', content: '#000000' },
+                    { name: 'theme-color', content: '#000000' },
 
-                      // Facebook
-                      { property: 'og:type', content: 'website' },
-                      { property: 'og:url', content: URL },
-                      { property: 'og:title', content: TITLE },
-                      { property: 'og:description', content: DESCRIPTION },
-                      { property: 'og:image', content: IMAGE_FB },
+                    // Facebook
+                    { property: 'og:type', content: 'website' },
+                    { property: 'og:url', content: URL },
+                    { property: 'og:title', content: TITLE },
+                    { property: 'og:description', content: DESCRIPTION },
+                    { property: 'og:image', content: IMAGE_FB },
 
-                      // Twitter
-                      {
-                          property: 'twitter:card',
-                          content: 'summary_large_image',
-                      },
-                      { property: 'twitter:url', content: URL },
-                      { property: 'twitter:title', content: TITLE },
-                      { property: 'twitter:description', content: DESCRIPTION },
-                      { property: 'og:image', content: IMAGE_TWITTER },
-                  ]
+                    // Twitter
+                    {
+                        property: 'twitter:card',
+                        content: 'summary_large_image',
+                    },
+                    { property: 'twitter:url', content: URL },
+                    { property: 'twitter:title', content: TITLE },
+                    { property: 'twitter:description', content: DESCRIPTION },
+                    { property: 'og:image', content: IMAGE_TWITTER },
+                ]
                 : []),
         ],
         link: [
             ...(ACR_PLATFORM === 'web'
                 ? [
-                      ...appleIcons.map(size => ({
-                          rel: 'apple-touch-icon',
-                          sizes: `${size}x${size}`,
-                          href: `${URL}/apple-touch-icon-${size}x${size}.png`,
-                      })),
-                      {
-                          rel: 'icon shortcut',
-                          sizes: 'any',
-                          href: `${URL}/favicon.ico`,
-                      },
-                  ]
+                    ...appleIcons.map(size => ({
+                        rel: 'apple-touch-icon',
+                        sizes: `${size}x${size}`,
+                        href: `${URL}/apple-touch-icon-${size}x${size}.png`,
+                    })),
+                    {
+                        rel: 'icon shortcut',
+                        sizes: 'any',
+                        href: `${URL}/favicon.ico`,
+                    },
+                ]
                 : []),
             {
                 rel: 'prefetch',
@@ -281,7 +281,7 @@ const config: NuxtConfig = {
     },
     ignore: ['**/*.test.*', '**/*.spec.*', 'tests'],
     build: {
-        transpile: ['vue-final-modal'],
+        transpile: ['vue-final-modal', 'y-prosemirror'],
         extend(config, { isClient }) {
             // @ts-ignore
             config.resolve.alias.vue = 'vue/dist/vue.esm';
@@ -362,7 +362,8 @@ const config: NuxtConfig = {
                             options: {
                                 presets: ['@babel/preset-env'],
                                 plugins: [
-                                    '@babel/plugin-proposal-nullish-coalescing-operator',
+                                    '@babel/plugin-transform-nullish-coalescing-operator',
+                                    '@babel/plugin-transform-optional-chaining'
                                 ],
                             },
                         },
@@ -387,7 +388,8 @@ const config: NuxtConfig = {
                             options: {
                                 presets: ['@babel/preset-env'],
                                 plugins: [
-                                    '@babel/plugin-proposal-nullish-coalescing-operator',
+                                    '@babel/plugin-transform-nullish-coalescing-operator',
+                                    '@babel/plugin-transform-optional-chaining'
                                 ],
                             },
                         },
@@ -403,6 +405,7 @@ const config: NuxtConfig = {
                                 presets: ['@babel/preset-env'],
                                 plugins: [
                                     '@babel/plugin-transform-class-static-block',
+                                    '@babel/plugin-transform-optional-chaining'
                                 ],
                             },
                         },
@@ -413,9 +416,15 @@ const config: NuxtConfig = {
             return config;
         },
         babel: {
+            env: {
+                development: {
+                    compact: false
+                }
+            },
             plugins: [
                 ['@babel/plugin-proposal-private-methods', { loose: true }],
-                '@babel/plugin-proposal-nullish-coalescing-operator',
+                '@babel/plugin-transform-nullish-coalescing-operator',
+                '@babel/plugin-transform-optional-chaining'
             ],
         },
     },

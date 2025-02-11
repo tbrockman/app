@@ -106,7 +106,7 @@
 
 <script lang="ts">
 import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
-import { format, parse } from 'date-fns';
+import { format, parse, intlFormat } from 'date-fns';
 import DocumentIcon from '~/components/document/DocumentIcon.vue';
 import { DocumentContextMenu } from '~/components/context-menu';
 import { currentTimezone, localizedRelativeFormat } from '~/helpers/date';
@@ -268,22 +268,24 @@ export default class PageRow extends Vue {
     }
 
     get formatUpdatedAt(): string {
-        return format(
+        return intlFormat(
             new Date(this.document.updatedAt || new Date()),
-            `d MMM`,
             {
+                day: "numeric",
+                month: "short",
                 timeZone: currentTimezone(),
-            },
+            }
         );
     }
 
     get formatCreatedAt(): string {
-        return format(
+        return intlFormat(
             new Date(this.document.createdAt || new Date()),
-            `d MMM`,
             {
+                day: "numeric",
+                month: "short",
                 timeZone: currentTimezone(),
-            },
+            }
         );
     }
 

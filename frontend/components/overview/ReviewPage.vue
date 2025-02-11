@@ -104,11 +104,13 @@ export default class ReviewPage extends Vue {
     get timeDelta() {
         const now = startOfDay(new Date());
 
-        const taskStart = startOfDay(
-            this.document!.start?.date ?? this.document!.start?.dateTime,
-        );
+        const start = this.document!.start?.date ?? this.document!.start?.dateTime;
 
-        if (!taskStart) return '';
+        if (!start) {
+            return '';
+        }
+
+        const taskStart = startOfDay(start);
 
         if (isToday(taskStart)) {
             return 'today';

@@ -1,4 +1,4 @@
-import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
+import { Plugin, PluginKey, Selection, TextSelection } from '@tiptap/pm/state';
 import { VueNodeViewRenderer } from '@tiptap/vue-2';
 import CodeBlockComponent from './CodeBlockComponent.vue';
 import { registerEditorExtension } from '~/components/editor/extensions';
@@ -11,6 +11,15 @@ import {
     wrapSelection,
 } from '~/components/editor/extensions/codeblock/helpers';
 import { CodeBlock } from '../codeblock-codemirror';
+import {
+    EditorView as CodeMirror, KeyBinding, ViewUpdate, keymap as cmKeymap, drawSelection
+} from "@codemirror/view"
+import { javascript } from "@codemirror/lang-javascript"
+import { defaultKeymap } from "@codemirror/commands"
+import { syntaxHighlighting, defaultHighlightStyle } from "@codemirror/language"
+import { vscodeDark, vscodeLight } from '@uiw/codemirror-theme-vscode';
+import { exitCode } from "prosemirror-commands"
+import { undo, redo } from "prosemirror-history"
 
 registerEditorExtension({
     type: EditorTypes.FULL,
@@ -368,7 +377,134 @@ registerEditorExtension({
             },
 
             addNodeView() {
-                return VueNodeViewRenderer(CodeBlockComponent);
+                return ({ editor, node, getPos, HTMLAttributes }) => {
+                    // Create a wrapper div for CodeMirror
+                    const { view, schema } = editor;
+                    const dom = document.createElement("div");
+                    dom.classList.add("cm-wrapper");
+                    let updating = false;
+
+                    const forwardUpdate = (cm: CodeMirror, update: ViewUpdate) => {
+                        if (updating || !cm.hasFocus) return
+                        // @ts-expect-error
+                        let offset = getPos() + 1, { main } = update.state.selection
+                        let selFrom = offset + main.from, selTo = offset + main.to
+                        let pmSel = view.state.selection
+                        if (update.docChanged || pmSel.from != selFrom || pmSel.to != selTo) {
+                            let tr = view.state.tr
+                            update.changes.iterChanges((fromA, toA, fromB, toB, text) => {
+                                if (text.length)
+                                    tr.replaceWith(offset + fromA, offset + toA,
+                                        schema.text(text.toString()))
+                                else
+                                    tr.delete(offset + fromA, offset + toA)
+                                offset += (toB - fromB) - (toA - fromA)
+                            })
+                            tr.setSelection(TextSelection.create(tr.doc, selFrom, selTo))
+                            view.dispatch(tr)
+                        }
+                    }
+
+                    const maybeEscape = (unit: any, dir: any) => {
+                        let { state } = cm, { main }: any = state.selection
+                        if (!main.empty) return false
+                        if (unit == "line") main = state.doc.lineAt(main.head)
+                        if (dir < 0 ? main.from > 0 : main.to < state.doc.length) return false
+                        // @ts-ignore
+                        let targetPos = getPos() + (dir < 0 ? 0 : node.nodeSize)
+                        let selection = Selection.near(view.state.doc.resolve(targetPos), dir)
+                        let tr = view.state.tr.setSelection(selection).scrollIntoView()
+                        view.dispatch(tr)
+                        view.focus()
+                    }
+
+                    const codemirrorKeymap = () => {
+                        return [
+                            { key: "ArrowUp", run: () => maybeEscape("line", -1) },
+                            { key: "ArrowLeft", run: () => maybeEscape("char", -1) },
+                            { key: "ArrowDown", run: () => maybeEscape("line", 1) },
+                            { key: "ArrowRight", run: () => maybeEscape("char", 1) },
+                            {
+                                key: "Ctrl-Enter", run: () => {
+                                    if (!exitCode(view.state, view.dispatch)) return false
+                                    view.focus()
+                                    return true
+                                }
+                            },
+                            {
+                                key: "Ctrl-z", mac: "Cmd-z",
+                                run: () => undo(view.state, view.dispatch)
+                            },
+                            {
+                                key: "Shift-Ctrl-z", mac: "Shift-Cmd-z",
+                                run: () => redo(view.state, view.dispatch)
+                            },
+                            {
+                                key: "Ctrl-y", mac: "Cmd-y",
+                                run: () => redo(view.state, view.dispatch)
+                            }
+                        ] as KeyBinding[]
+                    }
+
+                    // Create a CodeMirror instance
+                    const cm = new CodeMirror({
+                        doc: node.textContent,
+                        extensions: [
+                            cmKeymap.of([
+                                ...codemirrorKeymap(),
+                                ...defaultKeymap
+                            ]),
+                            drawSelection(),
+                            // syntaxHighlighting(defaultHighlightStyle),
+                            vscodeDark,
+                            javascript({ jsx: true, typescript: true }),
+                            CodeMirror.updateListener.of((update) => { forwardUpdate(cm, update) }),
+                        ],
+                    });
+
+                    // Append CodeMirror to the wrapper
+                    dom.appendChild(cm.dom);
+
+                    return {
+                        dom,
+                        setSelection(anchor, head) {
+                            cm.focus()
+                            updating = true
+                            cm.dispatch({ selection: { anchor, head } })
+                            updating = false
+                        },
+                        destroy() {
+                            cm.destroy();
+                        },
+                        update(updated) {
+                            if (updated.type != node.type) return false
+                            node = updated
+                            if (updating) return true
+                            let newText = updated.textContent, curText = cm.state.doc.toString()
+                            if (newText != curText) {
+                                let start = 0, curEnd = curText.length, newEnd = newText.length
+                                while (start < curEnd &&
+                                    curText.charCodeAt(start) == newText.charCodeAt(start)) {
+                                    ++start
+                                }
+                                while (curEnd > start && newEnd > start &&
+                                    curText.charCodeAt(curEnd - 1) == newText.charCodeAt(newEnd - 1)) {
+                                    curEnd--
+                                    newEnd--
+                                }
+                                updating = true
+                                cm.dispatch({
+                                    changes: {
+                                        from: start, to: curEnd,
+                                        insert: newText.slice(start, newEnd)
+                                    }
+                                })
+                                updating = false
+                            }
+                            return true
+                        }
+                    };
+                };
             },
 
             addAttributes() {
@@ -421,7 +557,6 @@ registerEditorExtension({
             },
 
             renderHTML({ HTMLAttributes }) {
-                console.log('html being rendered here', HTMLAttributes)
                 return [
                     'pre',
                     this.options.HTMLAttributes,

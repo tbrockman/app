@@ -1,11 +1,11 @@
 import { CommandProps, Editor, generateHTML, JSONContent } from '@tiptap/core';
-import { CodeBlock } from '@tiptap/extension-code-block';
 import { Node } from '@tiptap/pm/model';
 import { INLINE_DOCUMENT_LINK_NODE_NAME } from '~/components/editor/extensions/inline-document-link';
 import { IDocument } from '~/components/document/model';
 import { BLOCK_KATEX_NODE_NAME } from '~/components/editor/extensions/katex';
 import { MERMAID_NODE_NAME } from '~/components/editor/extensions/mermaid';
 import { INLINE_TASK_CONTENT_NAME } from '~/components/editor/extensions/task-item';
+import { CodeBlock } from '~/components/editor/extensions/codeblock-codemirror';
 
 export const isDragEvent = (event: any): event is DragEvent => {
     return event && event.dataTransfer;

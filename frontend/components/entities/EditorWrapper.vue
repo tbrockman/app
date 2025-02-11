@@ -44,14 +44,14 @@ import { FocusPosition } from '@tiptap/core';
 import { v4 } from 'uuid';
 import scrollIntoView from 'scroll-into-view';
 import { IDocument } from '~/components/document/model';
-import type EditorComponent from '~/components/editor/EditorComponent.vue';
 import { TabSymbols } from '~/constants/symbols';
 import { ITask } from '~/components/task/model';
+import EditorComponent from '~/components/editor/EditorComponent.vue';
 
 @Component({
     name: 'EditorWrapper',
     components: {
-        Editor: () => import('~/components/editor/EditorComponent.vue'),
+        Editor: EditorComponent, // Use direct import instead of async import
     },
 })
 export default class EditorWrapper extends Vue {

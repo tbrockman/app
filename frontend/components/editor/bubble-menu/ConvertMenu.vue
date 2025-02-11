@@ -90,7 +90,6 @@ import {
 } from '@vue-hero-icons/solid';
 import { CommandProps, Editor, generateHTML, JSONContent } from '@tiptap/core';
 import { v4 } from 'uuid';
-import { CodeBlock } from '@tiptap/extension-code-block';
 import { Level } from '@tiptap/extension-heading';
 import { NodeSelection } from '@tiptap/pm/state';
 import { DOMSerializer } from '@tiptap/pm/model';

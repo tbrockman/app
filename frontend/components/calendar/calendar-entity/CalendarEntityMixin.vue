@@ -27,8 +27,8 @@ export default class CalendarEntityMixin extends Vue {
 
         const tFormat =
             this.$store.getters['appSettings/dateTimeOptions'].timeFormat;
-        const start = event.start;
-        const end = event.end;
+        const start = event.start?.date!;
+        const end = event.end?.date!;
 
         const diff = differenceInMinutes(end, start);
 

@@ -315,7 +315,7 @@ export default class FullTextSearch extends Vue {
 
         this.$store.dispatch('documentSearch/setTerm', this.text.trim());
 
-        const goTo = (dailyDocDate?: Date) => {
+        const goTo = (dailyDocDate?: Date | null) => {
             if (searchIndexType === SearchIndex.INTEGRATION_DATA) {
                 const entity = this.$store.getters['integrationData/byId'](id);
 
