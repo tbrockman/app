@@ -129,6 +129,7 @@ export default class NewVaultButtons extends Vue {
             canCreate: false,
         },
     ): Promise<string | null> {
+        // @ts-ignore
         return await (window as SafeElectronWindow).electron.selectDirectory(
             meta,
         );

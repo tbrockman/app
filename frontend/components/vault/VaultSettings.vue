@@ -31,8 +31,8 @@
                     <input
                         type="text"
                         :value="name"
-                        @input="updateName($event.target.value)"
-                        @blur="saveName($event.target.value)"
+                        @input="updateName($event.target?.value)"
+                        @blur="saveName($event.target?.value)"
                     />
                 </div>
             </div>

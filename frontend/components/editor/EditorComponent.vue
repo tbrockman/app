@@ -14,7 +14,7 @@
                 ref="bubbleMenu"
                 :visible="!mousedown"
                 :editor="editorInstance"
-                :utils="editor.utils"
+                :utils="editor?.utils"
                 :document-id="docId"
             />
         </editor-bubble-menu>

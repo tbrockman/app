@@ -12,14 +12,24 @@ import {
 } from '~/components/editor/extensions/codeblock/helpers';
 import { CodeBlock } from '../codeblock-codemirror';
 import {
-    EditorView as CodeMirror, KeyBinding, ViewUpdate, keymap as cmKeymap, drawSelection
+    EditorView as CodeMirror, EditorView, KeyBinding, ViewUpdate, keymap as cmKeymap, drawSelection,
+    gutter,
+    highlightActiveLineGutter,
+    lineNumbers
 } from "@codemirror/view"
 import { javascript } from "@codemirror/lang-javascript"
-import { defaultKeymap } from "@codemirror/commands"
-import { syntaxHighlighting, defaultHighlightStyle } from "@codemirror/language"
+import { defaultKeymap, historyKeymap } from "@codemirror/commands"
 import { vscodeDark, vscodeLight } from '@uiw/codemirror-theme-vscode';
 import { exitCode } from "prosemirror-commands"
 import { undo, redo } from "prosemirror-history"
+import {
+    completionKeymap,
+    closeBrackets,
+    closeBracketsKeymap,
+    autocompletion,
+} from "@codemirror/autocomplete";
+import { bracketMatching, foldGutter, foldKeymap, indentOnInput } from '@codemirror/language';
+
 
 registerEditorExtension({
     type: EditorTypes.FULL,
@@ -450,9 +460,21 @@ registerEditorExtension({
                     const cm = new CodeMirror({
                         doc: node.textContent,
                         extensions: [
+                            EditorView.lineWrapping,
+                            autocompletion(),
+                            gutter({}),
+                            lineNumbers(),
+                            bracketMatching(),
+                            highlightActiveLineGutter(),
+                            foldGutter(),
+                            closeBrackets(),
                             cmKeymap.of([
+                                ...defaultKeymap,
+                                ...closeBracketsKeymap,
                                 ...codemirrorKeymap(),
-                                ...defaultKeymap
+                                ...historyKeymap,
+                                ...foldKeymap,
+                                ...completionKeymap,
                             ]),
                             drawSelection(),
                             // syntaxHighlighting(defaultHighlightStyle),

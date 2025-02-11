@@ -27,12 +27,9 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { NodeViewWrapper, NodeViewContent, nodeViewProps } from '@tiptap/vue-2';
+import { NodeViewWrapper, NodeViewContent, nodeViewProps, Editor } from '@tiptap/vue-2';
 import { Node } from '@tiptap/pm/model';
-import { CheckIcon } from '@vue-hero-icons/solid';
-import { ClipboardCopyIcon } from '@vue-hero-icons/outline';
 import LanguageSelector from './LanguageSelector.vue';
-import CopyIcon from '~/components/icons/CopyIcon.vue';
 import InterfaceFileClipboard from '~/components/streamline/InterfaceFileClipboard.vue';
 @Component({
     name: 'CodeBlockComponent',
@@ -40,10 +37,7 @@ import InterfaceFileClipboard from '~/components/streamline/InterfaceFileClipboa
         InterfaceFileClipboard,
         NodeViewWrapper,
         NodeViewContent,
-        CopyIcon,
         LanguageSelector,
-        ClipboardCopyIcon,
-        CheckIcon,
     },
     props: nodeViewProps,
 })
@@ -51,7 +45,7 @@ export default class CodeBlockComponent extends Vue {
     node!: Node;
     extension!: any;
     getPos!: any;
-    editor!: any;
+    editor!: Editor;
     updateAttributes!: any;
     selectionOpen: boolean = false;
     copyInteraction: boolean = false;
