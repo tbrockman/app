@@ -281,7 +281,7 @@ const config: NuxtConfig = {
     },
     ignore: ['**/*.test.*', '**/*.spec.*', 'tests'],
     build: {
-        transpile: ['vue-final-modal', 'y-prosemirror'],
+        transpile: ['vue-final-modal', 'y-prosemirror', 'katex', 'mermaid'],
         extend(config, { isClient }) {
             // @ts-ignore
             config.resolve.alias.vue = 'vue/dist/vue.esm';

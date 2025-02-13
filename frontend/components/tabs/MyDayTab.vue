@@ -678,12 +678,14 @@ export default class MyDayTab extends TabMixin<MyDayData> {
         this.$shortcutsManager.registerShortcut(
             this.$shortcutsManager.availableShortcuts.MY_DAY_NEXT_DAY,
             () => {
+                console.log('next day');
                 this.setNextDayShortcut();
             },
         );
         this.$shortcutsManager.registerShortcut(
             this.$shortcutsManager.availableShortcuts.MY_DAY_PREVIOUS_DAY,
             () => {
+                console.log('previous day');
                 this.setPreviousDayShortcut();
             },
         );

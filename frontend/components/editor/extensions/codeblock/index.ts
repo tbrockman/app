@@ -123,7 +123,7 @@ registerEditorExtension({
                         const editor = ctx.editor();
                         if (!editor) return false;
                         const { $anchor } = editor.state.selection;
-
+                        console.log('capturing tab', $anchor.parent.type.name)
                         if ($anchor.parent.type.name !== this.name) {
                             return false;
                         }
@@ -388,10 +388,7 @@ registerEditorExtension({
 
             addNodeView() {
                 return ({ editor, node, getPos, HTMLAttributes }) => {
-                    // Create a wrapper div for CodeMirror
                     const { view, schema } = editor;
-                    const dom = document.createElement("div");
-                    dom.classList.add("cm-wrapper");
                     let updating = false;
 
                     const forwardUpdate = (cm: CodeMirror, update: ViewUpdate) => {
@@ -400,8 +397,11 @@ registerEditorExtension({
                         let offset = getPos() + 1, { main } = update.state.selection
                         let selFrom = offset + main.from, selTo = offset + main.to
                         let pmSel = view.state.selection
+                        console.log('forward update', { offset, selFrom, selTo, pmSel, cm, update, hasFocus: cm.hasFocus, changed: update.docChanged, tr: view.state.tr })
+
                         if (update.docChanged || pmSel.from != selFrom || pmSel.to != selTo) {
                             let tr = view.state.tr
+
                             update.changes.iterChanges((fromA, toA, fromB, toB, text) => {
                                 if (text.length)
                                     tr.replaceWith(offset + fromA, offset + toA,
@@ -416,6 +416,7 @@ registerEditorExtension({
                     }
 
                     const maybeEscape = (unit: any, dir: any) => {
+                        console.log('maybe escape', unit, dir)
                         let { state } = cm, { main }: any = state.selection
                         if (!main.empty) return false
                         if (unit == "line") main = state.doc.lineAt(main.head)
@@ -483,13 +484,12 @@ registerEditorExtension({
                             CodeMirror.updateListener.of((update) => { forwardUpdate(cm, update) }),
                         ],
                     });
-
-                    // Append CodeMirror to the wrapper
-                    dom.appendChild(cm.dom);
+                    const dom = cm.dom;
 
                     return {
                         dom,
-                        setSelection(anchor, head) {
+                        setSelection(anchor, head, root) {
+                            console.log('setting selection', { anchor, head, root, updating })
                             cm.focus()
                             updating = true
                             cm.dispatch({ selection: { anchor, head } })
@@ -498,10 +498,14 @@ registerEditorExtension({
                         destroy() {
                             cm.destroy();
                         },
+                        selectNode() { cm.focus() },
+                        stopEvent(e) { console.log('would be preventing e', e); return true },
                         update(updated) {
+                            console.log('updated', { updatedType: updated.type, nodeType: node.type, equal: updated.type == node.type, updating })
                             if (updated.type != node.type) return false
                             node = updated
                             if (updating) return true
+
                             let newText = updated.textContent, curText = cm.state.doc.toString()
                             if (newText != curText) {
                                 let start = 0, curEnd = curText.length, newEnd = newText.length

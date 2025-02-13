@@ -1,6 +1,5 @@
 import { Editor as TipTapEditor, EditorOptions } from '@tiptap/vue-2';
 import { ParseOptions } from '@tiptap/pm/model';
-import { lowlight } from 'lowlight';
 import { EditorState } from '@tiptap/pm/state';
 import debounce from 'lodash/debounce';
 import { EditorContext, EditorContextConfig } from '~/@types/app';
@@ -66,7 +65,6 @@ const defaultEditorConfig = (): Partial<EditorContextConfig> => ({
     },
     codeblock: {
         defaultLanguage: null,
-        lowlight,
     },
     uniqueId: {
         types: [
@@ -265,9 +263,16 @@ export class Editor {
         });
 
         this.editor?.on('blur', () => {
+
+            // if the editor's children also aren't focused, then we enable the namespace
+            if (this.editor.view.dom.contains(document.activeElement)) {
+                return;
+            }
+
             if (this.context.config.editable) {
                 this.context.store.commit('editorFocused', false);
             }
+
             this.context.shortcutsManager.enableNamespace('editor-inactive');
             this.editor.storage.lastFocusPosition.value = this.editor?.state
                 .selection.anchor as number;
@@ -313,7 +318,7 @@ export class Editor {
         if (
             !this.context.nuxt.$utils.isMobile &&
             this.context.groupId !==
-                this.context.store.getters['tabs/activeGroup'].id
+            this.context.store.getters['tabs/activeGroup'].id
         ) {
             return;
         }
@@ -327,7 +332,7 @@ export class Editor {
         if (
             !this.context.nuxt.$utils.isMobile &&
             this.context.groupId !==
-                this.context.store.getters['tabs/activeGroup'].id
+            this.context.store.getters['tabs/activeGroup'].id
         ) {
             return;
         }
