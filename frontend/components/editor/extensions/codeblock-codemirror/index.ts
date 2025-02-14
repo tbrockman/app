@@ -58,12 +58,12 @@ declare module '@tiptap/core' {
 /**
  * Matches a code block with backticks.
  */
-export const backtickInputRegex = /^```([a-z]+)?[\s\n]$/
+export const backtickInputRegex = /^```(\S*)[\s\n]$/
 
 /**
  * Matches a code block with tildes.
  */
-export const tildeInputRegex = /^~~~([a-z]+)?[\s\n]$/
+export const tildeInputRegex = /^~~~(\S*)[\s\n]$/
 
 /**
  * This extension allows you to create code blocks.
@@ -198,20 +198,74 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
     },
 
     addInputRules() {
+
+        // TODO: allow client extensions to this
+        const extToLanguageMap: Record<string, string> = {
+            js: 'javascript',
+            ts: 'javascript',
+            jsx: 'javascript',
+            tsx: 'javascript',
+            py: 'python',
+            rb: 'ruby',
+            php: 'php',
+            java: 'java',
+            cpp: 'cpp',
+            c: 'c',
+            cs: 'csharp',
+            go: 'go',
+            swift: 'swift',
+            kt: 'kotlin',
+            rs: 'rust',
+            scala: 'scala',
+            m: 'objectivec',
+            vb: 'vb',
+            hs: 'haskell',
+            lua: 'lua',
+            pl: 'perl',
+            sh: 'bash',
+            sql: 'sql',
+            html: 'html',
+            css: 'css',
+            scss: 'scss',
+            less: 'less',
+            json: 'json',
+            yaml: 'yaml',
+            xml: 'xml',
+            md: 'markdown',
+            toml: 'toml',
+            ini: 'ini',
+            conf: 'ini',
+            log: 'ini',
+            env: 'ini',
+            dockerfile: 'dockerfile',
+            makefile: 'makefile',
+            dockerignore: 'gitignore',
+            gitignore: 'gitignore',
+        }
+
+        const getAttributes = (match: RegExpMatchArray) => {
+            const languageOrPath = match[1]
+            const split = languageOrPath.split('.')
+            // if there is a dot in the language, we assume it's a file path
+            const ext = split.length > 1 ? split.pop() : undefined
+            const language = ext ? (extToLanguageMap[ext] || ext) : languageOrPath
+
+            return {
+                language,
+                ext
+            }
+        }
+
         return [
             textblockTypeInputRule({
                 find: backtickInputRegex,
                 type: this.type,
-                getAttributes: match => ({
-                    language: match[1],
-                }),
+                getAttributes
             }),
             textblockTypeInputRule({
                 find: tildeInputRegex,
                 type: this.type,
-                getAttributes: match => ({
-                    language: match[1],
-                }),
+                getAttributes
             }),
         ]
     },

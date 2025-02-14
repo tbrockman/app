@@ -387,9 +387,11 @@ registerEditorExtension({
             },
 
             addNodeView() {
-                return ({ editor, node, getPos, HTMLAttributes }) => {
+                return ({ editor, node, getPos, HTMLAttributes: attr }) => {
                     const { view, schema } = editor;
                     let updating = false;
+
+                    console.log('have attr/options', { attr, nodeAttrs: node.attrs })
 
                     const forwardUpdate = (cm: CodeMirror, update: ViewUpdate) => {
                         if (updating || !cm.hasFocus) return

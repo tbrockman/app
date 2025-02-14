@@ -342,8 +342,6 @@ const HashtagParserNode = Node.create({
     },
 });
 
-export const CodeBlockParserNode = CodeBlock
-
 export const ParserNodesList = [
     InlineTaskParserNode,
     DetailsNode,
@@ -366,7 +364,7 @@ export const ParserNodesList = [
     TableHeader,
     TaskList,
     TaskItem,
-    CodeBlockParserNode,
+    CodeBlock,
     StarterKit.configure({
         hardBreak: false,
         codeBlock: false,
