@@ -391,10 +391,11 @@ registerEditorExtension({
                     const { view, schema } = editor;
                     let updating = false;
 
-                    console.log('have attr/options', { attr, nodeAttrs: node.attrs })
+                    console.log('adding node view', { nodeAttrs: node.attrs, attr, })
 
                     const forwardUpdate = (cm: CodeMirror, update: ViewUpdate) => {
                         if (updating || !cm.hasFocus) return
+
                         // @ts-expect-error
                         let offset = getPos() + 1, { main } = update.state.selection
                         let selFrom = offset + main.from, selTo = offset + main.to
@@ -537,6 +538,16 @@ registerEditorExtension({
 
             addAttributes() {
                 return {
+                    filepath: {
+                        default: null,  // Stores the file path if provided
+                        parseHTML: element => element.firstElementChild?.getAttribute('data-filepath'),
+                        renderHTML: attributes => {
+                            if (!attributes.filepath) {
+                                return null;
+                            }
+                            return { 'data-filepath': attributes.filepath };
+                        },
+                    },
                     language: {
                         default: null,
                         parseHTML: element => {
@@ -585,6 +596,8 @@ registerEditorExtension({
             },
 
             renderHTML({ HTMLAttributes }) {
+                console.log('rendering codeblock with attributs', HTMLAttributes)
+
                 return [
                     'pre',
                     this.options.HTMLAttributes,

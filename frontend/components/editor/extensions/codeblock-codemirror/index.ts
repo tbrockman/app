@@ -246,13 +246,14 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         const getAttributes = (match: RegExpMatchArray) => {
             const languageOrPath = match[1]
             const split = languageOrPath.split('.')
-            // if there is a dot in the language, we assume it's a file path
             const ext = split.length > 1 ? split.pop() : undefined
             const language = ext ? (extToLanguageMap[ext] || ext) : languageOrPath
 
+            console.log('getting attributes', { language, ext, languageOrPath })
+
             return {
                 language,
-                ext
+                filepath: ext ? languageOrPath : null, // Store as filepath only if it has an extension
             }
         }
 
