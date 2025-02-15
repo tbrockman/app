@@ -1,0 +1,18 @@
+.codeblock-container {
+
+    font-family: Menlo, Monaco, Consolas, "Andale Mono", "Ubuntu Mono", "Courier New", monospace;
+
+    .codeblock-toolbar {
+        background-color: var(--app-bg-color);
+        padding: 0 8px;
+        color: var(--app-text-color);
+    }
+
+    .cm-activeLineGutter {
+        background-color: transparent;
+    }
+
+    .cm-content {
+        /* padding-top: 0; */
+    }
+}

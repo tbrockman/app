@@ -29,7 +29,7 @@ import {
     autocompletion,
 } from "@codemirror/autocomplete";
 import { bracketMatching, foldGutter, foldKeymap, indentOnInput } from '@codemirror/language';
-
+import './styles.css';
 
 registerEditorExtension({
     type: EditorTypes.FULL,
@@ -460,6 +460,19 @@ registerEditorExtension({
                         ] as KeyBinding[]
                     }
 
+                    const container = document.createElement('div')
+                    container.classList.add('codeblock-container')
+
+                    const toolbar = document.createElement('div')
+                    toolbar.classList.add('codeblock-toolbar')
+                    container.appendChild(toolbar)
+
+                    // TODO: refactor to a const or something
+                    if ('data-filepath' in attr) {
+                        // TODO: when we figure out fs stuff, render filepath relative to cwd
+                        toolbar.textContent = attr['data-filepath']
+                    }
+
                     // Create a CodeMirror instance
                     const cm = new CodeMirror({
                         doc: node.textContent,
@@ -487,7 +500,9 @@ registerEditorExtension({
                             CodeMirror.updateListener.of((update) => { forwardUpdate(cm, update) }),
                         ],
                     });
-                    const dom = cm.dom;
+
+                    container.appendChild(cm.dom)
+                    const dom = container;
 
                     return {
                         dom,
@@ -539,7 +554,7 @@ registerEditorExtension({
             addAttributes() {
                 return {
                     filepath: {
-                        default: null,  // Stores the file path if provided
+                        default: null,
                         parseHTML: element => element.firstElementChild?.getAttribute('data-filepath'),
                         renderHTML: attributes => {
                             if (!attributes.filepath) {
@@ -597,6 +612,11 @@ registerEditorExtension({
 
             renderHTML({ HTMLAttributes }) {
                 console.log('rendering codeblock with attributs', HTMLAttributes)
+
+                const { 'data-filepath': filepath } = HTMLAttributes;
+                if (filepath) {
+
+                }
 
                 return [
                     'pre',
