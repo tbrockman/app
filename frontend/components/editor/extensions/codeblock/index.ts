@@ -389,6 +389,7 @@ registerEditorExtension({
             addNodeView() {
                 return ({ editor, node, getPos, HTMLAttributes: attr }) => {
                     const { view, schema } = editor;
+                    const { 'data-filepath': filepath } = attr;
                     let updating = false;
 
                     console.log('adding node view', { nodeAttrs: node.attrs, attr, })
@@ -465,17 +466,14 @@ registerEditorExtension({
 
                     const toolbar = document.createElement('div')
                     toolbar.classList.add('codeblock-toolbar')
+                    toolbar.textContent = filepath
                     container.appendChild(toolbar)
-
-                    // TODO: refactor to a const or something
-                    if ('data-filepath' in attr) {
-                        // TODO: when we figure out fs stuff, render filepath relative to cwd
-                        toolbar.textContent = attr['data-filepath']
-                    }
+                    console.log({ txt: node.textContent, filepath })
+                    const textContent = node.textContent || ''
 
                     // Create a CodeMirror instance
                     const cm = new CodeMirror({
-                        doc: node.textContent,
+                        doc: textContent,
                         extensions: [
                             EditorView.lineWrapping,
                             autocompletion(),
@@ -496,6 +494,7 @@ registerEditorExtension({
                             drawSelection(),
                             // syntaxHighlighting(defaultHighlightStyle),
                             vscodeDark,
+                            indentOnInput(),
                             javascript({ jsx: true, typescript: true }),
                             CodeMirror.updateListener.of((update) => { forwardUpdate(cm, update) }),
                         ],
