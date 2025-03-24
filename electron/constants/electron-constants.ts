@@ -70,6 +70,7 @@ export enum DEVICE_ACTIONS {
     FOLDER_CREATE = 'folder-create',
     IS_FOLDER_EMPTY = 'folder-is-empty',
     SAVE_AS = 'save-as',
+    WATCH = 'watch',
 
     NOTIFICATION_INITIALIZE = 'notification-initialize',
     NOTIFICATION_SCHEDULE = 'notification-schedule',

@@ -281,6 +281,9 @@ contextBridge.exposeInMainWorld('electron', {
     openExternal: (url: string) => {
         return shell.openExternal(url);
     },
+    watch: (path: string) => {
+        return ipcRenderer.invoke('watch', path);
+    },
     showItemInFolder: (path: string) => {
         ipcRenderer.invoke('show-in-finder', path);
     },

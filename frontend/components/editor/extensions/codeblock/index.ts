@@ -1,6 +1,4 @@
 import { Plugin, PluginKey, Selection, TextSelection } from '@tiptap/pm/state';
-import { VueNodeViewRenderer } from '@tiptap/vue-2';
-import CodeBlockComponent from './CodeBlockComponent.vue';
 import { registerEditorExtension } from '~/components/editor/extensions';
 import { EditorContext } from '~/@types/app';
 import { EditorTypes } from '~/constants';
@@ -12,24 +10,19 @@ import {
 } from '~/components/editor/extensions/codeblock/helpers';
 import { CodeBlock } from '../codeblock-codemirror';
 import {
-    EditorView as CodeMirror, EditorView, KeyBinding, ViewUpdate, keymap as cmKeymap, drawSelection,
-    gutter,
-    highlightActiveLineGutter,
-    lineNumbers
+    EditorView as CodeMirror, EditorView, KeyBinding, ViewUpdate, keymap as cmKeymap
 } from "@codemirror/view"
-import { javascript } from "@codemirror/lang-javascript"
 import { defaultKeymap, historyKeymap } from "@codemirror/commands"
-import { vscodeDark, vscodeLight } from '@uiw/codemirror-theme-vscode';
 import { exitCode } from "prosemirror-commands"
 import { undo, redo } from "prosemirror-history"
 import {
     completionKeymap,
-    closeBrackets,
     closeBracketsKeymap,
-    autocompletion,
 } from "@codemirror/autocomplete";
-import { bracketMatching, foldGutter, foldKeymap, indentOnInput } from '@codemirror/language';
+import { foldKeymap } from '@codemirror/language';
 import './styles.css';
+import { SafeElectronWindow } from '~/@types';
+import { codeblock as cb } from 'codeblock';
 
 registerEditorExtension({
     type: EditorTypes.FULL,
@@ -392,7 +385,7 @@ registerEditorExtension({
                     const { 'data-filepath': filepath } = attr;
                     let updating = false;
 
-                    console.log('adding node view', { nodeAttrs: node.attrs, attr, })
+                    console.log('adding node view', { nodeAttrs: node.attrs, attr, filepath })
 
                     const forwardUpdate = (cm: CodeMirror, update: ViewUpdate) => {
                         if (updating || !cm.hasFocus) return
@@ -469,20 +462,18 @@ registerEditorExtension({
                     toolbar.textContent = filepath
                     container.appendChild(toolbar)
                     console.log({ txt: node.textContent, filepath })
-                    const textContent = node.textContent || ''
+                    let textContent = node.textContent || ''
+
+                    if (filepath) {
+                        // (window as SafeElectronWindow).electron.openExternal
+                    }
 
                     // Create a CodeMirror instance
                     const cm = new CodeMirror({
                         doc: textContent,
                         extensions: [
                             EditorView.lineWrapping,
-                            autocompletion(),
-                            gutter({}),
-                            lineNumbers(),
-                            bracketMatching(),
-                            highlightActiveLineGutter(),
-                            foldGutter(),
-                            closeBrackets(),
+                            cb,
                             cmKeymap.of([
                                 ...defaultKeymap,
                                 ...closeBracketsKeymap,
@@ -491,11 +482,6 @@ registerEditorExtension({
                                 ...foldKeymap,
                                 ...completionKeymap,
                             ]),
-                            drawSelection(),
-                            // syntaxHighlighting(defaultHighlightStyle),
-                            vscodeDark,
-                            indentOnInput(),
-                            javascript({ jsx: true, typescript: true }),
                             CodeMirror.updateListener.of((update) => { forwardUpdate(cm, update) }),
                         ],
                     });
